@@ -6,10 +6,6 @@ using TransactionsIngest.Models;
 
 namespace TransactionsIngest.Services;
 
-/// <summary>
-/// Reads transactions from a local JSON file instead of the live API.
-/// Activated when <see cref="AppSettings.MockFeedPath"/> is configured.
-/// </summary>
 public sealed class MockTransactionFetcher : ITransactionFetcher
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -25,8 +21,7 @@ public sealed class MockTransactionFetcher : ITransactionFetcher
         ILogger<MockTransactionFetcher> logger)
     {
         _filePath = settings.Value.MockFeedPath
-                    ?? throw new InvalidOperationException(
-                           "MockFeedPath must be set when using MockTransactionFetcher.");
+            ?? throw new InvalidOperationException("MockFeedPath must be set when using MockTransactionFetcher.");
         _logger = logger;
     }
 
@@ -35,9 +30,8 @@ public sealed class MockTransactionFetcher : ITransactionFetcher
         _logger.LogInformation("Reading mock feed from {Path}", _filePath);
 
         await using var stream = File.OpenRead(_filePath);
-        var result = await JsonSerializer.DeserializeAsync<List<TransactionDto>>(
-                         stream, JsonOptions, ct)
-                     ?? throw new InvalidOperationException("Mock feed file is empty or null.");
+        var result = await JsonSerializer.DeserializeAsync<List<TransactionDto>>(stream, JsonOptions, ct)
+            ?? throw new InvalidOperationException("Mock feed file is empty or null.");
 
         _logger.LogInformation("Loaded {Count} transaction(s) from mock feed.", result.Count);
         return result;

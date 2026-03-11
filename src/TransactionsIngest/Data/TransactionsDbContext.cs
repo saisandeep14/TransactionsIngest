@@ -9,16 +9,15 @@ public sealed class TransactionsDbContext : DbContext
         : base(options) { }
 
     public DbSet<TransactionRecord> Transactions => Set<TransactionRecord>();
-    public DbSet<TransactionAudit>  Audits        => Set<TransactionAudit>();
+    public DbSet<TransactionAudit> Audits => Set<TransactionAudit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // TransactionRecord
         modelBuilder.Entity<TransactionRecord>(e =>
         {
             e.HasKey(t => t.TransactionId);
             e.Property(t => t.Amount).HasColumnType("decimal(18,2)");
-            e.Property(t => t.Status).HasConversion<string>(); // store enum as text
+            e.Property(t => t.Status).HasConversion<string>();
 
             e.HasMany(t => t.Audits)
              .WithOne(a => a.Transaction)
@@ -26,7 +25,6 @@ public sealed class TransactionsDbContext : DbContext
              .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // TransactionAudit — append-only, no updates expected
         modelBuilder.Entity<TransactionAudit>(e =>
         {
             e.HasKey(a => a.Id);

@@ -25,25 +25,25 @@ internal static class TestFactory
         IEnumerable<TransactionDto> feed,
         int windowHours = 24)
     {
-        var fetcher  = new StaticFetcher(feed.ToList());
+        var fetcher = new StaticFetcher(feed.ToList());
         var settings = Options.Create(new AppSettings { SnapshotWindowHours = windowHours });
         return new IngestionService(db, fetcher, settings, NullLogger<IngestionService>.Instance);
     }
 
     public static TransactionDto MakeDto(
         string id,
-        decimal amount      = 10.00m,
-        string card         = "4111111111111111",
-        string location     = "STO-01",
-        string product      = "Widget",
+        decimal amount = 10.00m,
+        string card = "4111111111111111",
+        string location = "STO-01",
+        string product = "Widget",
         DateTime? timestamp = null) => new()
     {
         TransactionId = id,
-        CardNumber    = card,
-        LocationCode  = location,
-        ProductName   = product,
-        Amount        = amount,
-        Timestamp     = timestamp ?? DateTime.UtcNow.AddHours(-1)
+        CardNumber = card,
+        LocationCode = location,
+        ProductName = product,
+        Amount = amount,
+        Timestamp = timestamp ?? DateTime.UtcNow.AddHours(-1)
     };
 
     private sealed class StaticFetcher : ITransactionFetcher

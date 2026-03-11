@@ -7,9 +7,6 @@ using TransactionsIngest.Models;
 
 namespace TransactionsIngest.Services;
 
-/// <summary>
-/// Fetches the 24-hour transaction snapshot from the live API endpoint.
-/// </summary>
 public sealed class HttpTransactionFetcher : ITransactionFetcher
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -17,8 +14,8 @@ public sealed class HttpTransactionFetcher : ITransactionFetcher
         PropertyNameCaseInsensitive = true
     };
 
-    private readonly HttpClient    _http;
-    private readonly AppSettings   _settings;
+    private readonly HttpClient _http;
+    private readonly AppSettings _settings;
     private readonly ILogger<HttpTransactionFetcher> _logger;
 
     public HttpTransactionFetcher(
@@ -26,9 +23,9 @@ public sealed class HttpTransactionFetcher : ITransactionFetcher
         IOptions<AppSettings> settings,
         ILogger<HttpTransactionFetcher> logger)
     {
-        _http     = http;
+        _http = http;
         _settings = settings.Value;
-        _logger   = logger;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<TransactionDto>> FetchAsync(CancellationToken ct = default)
@@ -37,7 +34,7 @@ public sealed class HttpTransactionFetcher : ITransactionFetcher
         _logger.LogInformation("Fetching transactions from {Url}", url);
 
         var result = await _http.GetFromJsonAsync<List<TransactionDto>>(url, JsonOptions, ct)
-                     ?? throw new InvalidOperationException("API returned null payload.");
+            ?? throw new InvalidOperationException("API returned null payload.");
 
         _logger.LogInformation("Fetched {Count} transaction(s) from API.", result.Count);
         return result;

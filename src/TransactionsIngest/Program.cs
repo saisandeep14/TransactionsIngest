@@ -7,7 +7,6 @@ using TransactionsIngest.Configuration;
 using TransactionsIngest.Data;
 using TransactionsIngest.Services;
 
-// ── Host setup ────────────────────────────────────────────────────────────────
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((_, config) =>
     {
@@ -32,29 +31,24 @@ var host = Host.CreateDefaultBuilder(args)
         services.Configure<AppSettings>(appSettingsSection);
         var appSettings = appSettingsSection.Get<AppSettings>() ?? new AppSettings();
 
-        // Database
         var connectionString = ctx.Configuration.GetConnectionString("DefaultConnection")
-                               ?? "Data Source=transactions.db";
+            ?? "Data Source=transactions.db";
 
         services.AddDbContext<TransactionsDbContext>(opts =>
             opts.UseSqlite(connectionString));
 
-        // Transaction fetcher: use mock feed if configured, otherwise real HTTP client
+        // use mock feed if configured, otherwise call the real API
         if (!string.IsNullOrWhiteSpace(appSettings.MockFeedPath))
-        {
             services.AddTransient<ITransactionFetcher, MockTransactionFetcher>();
-        }
         else
-        {
             services.AddHttpClient<ITransactionFetcher, HttpTransactionFetcher>();
-        }
 
         services.AddTransient<IngestionService>();
     })
     .Build();
 
-// ── Migrate database (creates tables on first run) ────────────────────────────
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
 using (var scope = host.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TransactionsDbContext>();
@@ -62,7 +56,6 @@ using (var scope = host.Services.CreateScope())
     await db.Database.MigrateAsync();
 }
 
-// ── Run ingestion ─────────────────────────────────────────────────────────────
 using (var scope = host.Services.CreateScope())
 {
     var service = scope.ServiceProvider.GetRequiredService<IngestionService>();
@@ -73,7 +66,7 @@ using (var scope = host.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        logger.LogCritical(ex, "Ingestion run failed with an unhandled exception.");
+        logger.LogCritical(ex, "Ingestion run failed.");
         return 1;
     }
 }

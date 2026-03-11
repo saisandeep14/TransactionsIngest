@@ -2,9 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace TransactionsIngest.Models;
 
-/// <summary>
-/// Mirrors the JSON shape returned by the transactions API (or mock feed).
-/// </summary>
 public sealed class TransactionDto
 {
     [JsonPropertyName("transactionId")]
