@@ -1,0 +1,22 @@
+## .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.db
+*.db-shm
+*.db-wal
+
+## Rider
+.idea/
+
+## VS Code
+.vscode/
+
+## Publish output
+publish/
+
+## OS
+.DS_Store
+Thumbs.db
